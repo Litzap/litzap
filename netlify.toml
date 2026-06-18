@@ -1,0 +1,12 @@
+# Netlify build config for the LitZap app (Next.js 14, app router + API routes)
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Official Next.js runtime — handles SSR, API routes, and image optimization
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
