@@ -1,0 +1,67 @@
+<svg width="420" height="560" viewBox="20 0 420 560" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+  <linearGradient id="furBase" x1="0" y1="0" x2="0.6" y2="1">
+    <stop offset="0" stop-color="#E8EDF5"/><stop offset="0.5" stop-color="#C9D3E0"/><stop offset="1" stop-color="#A6B3C6"/>
+  </linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#5B86FF"/><stop offset="1" stop-color="#7B5BFF"/>
+  </linearGradient>
+  <linearGradient id="visor" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3B6EF6"/><stop offset="1" stop-color="#5B86FF"/>
+  </linearGradient>
+  <radialGradient id="visorGlow" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#5B86FF" stop-opacity="0.6"/><stop offset="1" stop-color="#5B86FF" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#5B86FF" stop-opacity="0.30"/><stop offset="1" stop-color="#7B5BFF" stop-opacity="0.18"/>
+  </linearGradient>
+  <radialGradient id="shieldGlow" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0.6" stop-color="#5B86FF" stop-opacity="0"/><stop offset="1" stop-color="#5B86FF" stop-opacity="0.45"/>
+  </radialGradient>
+  <linearGradient id="streak" x1="0" y1="0" x2="1" y2="0.4">
+    <stop offset="0" stop-color="#3B6EF6"/><stop offset="1" stop-color="#7B5BFF"/>
+  </linearGradient>
+
+  <!-- ===== HEAD (reusable, anchored so 210,200 ~ center) ===== -->
+  <g id="head">
+    <g stroke="#0B0E16" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M150 148 L140 68 L198 126 Z" fill="url(#furBase)"/>
+      <path d="M270 148 L280 68 L222 126 Z" fill="url(#furBase)"/>
+      <path d="M159 136 L154 92 L186 126 Z" fill="url(#accent)" stroke-width="3"/>
+      <path d="M261 136 L266 92 L234 126 Z" fill="url(#accent)" stroke-width="3"/>
+      <path d="M210 108 C150 108 124 156 124 202 C124 248 152 280 184 290 C196 296 224 296 236 290 C268 280 296 248 296 202 C296 156 270 108 210 108 Z" fill="url(#furBase)"/>
+      <path d="M210 214 C186 214 172 232 174 252 C176 274 192 290 210 294 C228 290 244 274 246 252 C248 232 234 214 210 214 Z" fill="#EFF3F9" stroke-width="0"/>
+      <ellipse cx="210" cy="244" rx="10" ry="8" fill="#0B0E16" stroke-width="0"/>
+      <path d="M198 262 Q210 272 222 262" stroke="#0B0E16" stroke-width="4" fill="none"/>
+    </g>
+    <ellipse cx="210" cy="192" rx="94" ry="36" fill="url(#visorGlow)"/>
+    <g stroke="#0B0E16" stroke-width="5" stroke-linejoin="round">
+      <rect x="144" y="176" width="132" height="32" rx="16" fill="url(#visor)"/>
+    </g>
+    <rect x="156" y="184" width="44" height="8" rx="4" fill="#CFDDFF" opacity="0.85"/>
+    <rect x="224" y="184" width="34" height="8" rx="4" fill="#CFDDFF" opacity="0.6"/>
+  </g>
+
+  <!-- reusable cheek-mark variant of head (for success pose) -->
+  <g id="headCheek">
+    <use href="#head"/>
+    <path d="M250 232 l-9 16 6 0 -4 17 13 -22 -7 0 7 -11z" fill="url(#accent)" stroke="#0B0E16" stroke-width="2.2" stroke-linejoin="round"/>
+  </g>
+</defs>
+<g transform="translate(0 0)">
+  <g stroke="#0B0E16" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M286 372 C300 330 360 320 350 250 C396 292 374 356 300 366 Z" fill="url(#furBase)"/>
+    <path d="M351 250 l-24 30 15 2 -19 30 40 -36 -16 -1 18 -24z" fill="url(#accent)" stroke-width="3"/>
+    <path d="M156 322 C150 268 270 268 264 322 L258 432 C258 468 162 468 162 432 Z" fill="url(#furBase)"/>
+    <path d="M182 340 C182 314 238 314 238 340 L234 428 C234 450 186 450 186 428 Z" fill="#EFF3F9" stroke-width="0"/>
+    <path d="M213 352 l-19 38 13 0 -7 38 26 -48 -15 0 15 -28z" fill="url(#accent)" stroke-width="3"/>
+    <path d="M170 450 q-7 24 3 40 l32 0 q5 -22 -3 -40z" fill="url(#furBase)"/>
+    <path d="M250 450 q7 24 -3 40 l-32 0 q-5 -22 3 -40z" fill="url(#furBase)"/>
+    <path d="M160 342 C126 360 116 400 132 428 C146 416 152 392 172 374 Z" fill="url(#furBase)"/>
+    <path d="M258 330 C292 312 320 286 322 256 C300 250 286 280 262 300 C250 310 248 322 258 330 Z" fill="url(#furBase)"/>
+    <circle cx="318" cy="250" r="19" fill="url(#furBase)"/>
+  </g>
+  <use href="#head"/>
+  
+</g>
+</svg>

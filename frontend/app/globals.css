@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   Tokens — light + dark
+---------------------------------------------------------------- */
+:root {
+  --font-brand: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+:root,
+.light {
+  --bg: #f3f6fc;
+  --bg-grad-1: rgba(59, 110, 246, 0.10);
+  --bg-grad-2: rgba(110, 91, 246, 0.08);
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-2: rgba(255, 255, 255, 0.55);
+  --field: rgba(15, 23, 42, 0.05);
+  --border: rgba(15, 23, 42, 0.08);
+  --text: #0b0e16;
+  --muted: #5c6679;
+  --accent: #3b6ef6;
+  --accent-2: #7b5bff;
+  --accent-ring: rgba(59, 110, 246, 0.16);
+  --positive: #15a34a;
+  --shadow: 0 24px 60px rgba(16, 24, 40, 0.12);
+}
+
+.dark {
+  --bg: #07080d;
+  --bg-grad-1: rgba(91, 134, 255, 0.16);
+  --bg-grad-2: rgba(155, 124, 255, 0.13);
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --field: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #eef2f8;
+  --muted: #8b95a7;
+  --accent: #5b86ff;
+  --accent-2: #a78bff;
+  --accent-ring: rgba(91, 134, 255, 0.26);
+  --positive: #34d399;
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+body {
+  background:
+    radial-gradient(1100px 560px at 50% -14%, var(--bg-grad-1), transparent 60%),
+    radial-gradient(820px 480px at 90% 6%, var(--bg-grad-2), transparent 58%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: var(--accent-ring);
+}
+
+/* ---------------------------------------------------------------
+   Surfaces — soft, borderless, organic (no boxes)
+---------------------------------------------------------------- */
+.panel,
+.card {
+  position: relative;
+  background: var(--surface);
+  border-radius: 30px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+/* faint inner light edge instead of a hard border */
+.panel::before,
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.25), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* pill inputs — no square boxes */
+.field {
+  width: 100%;
+  background: var(--field);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  color: var(--text);
+  outline: none;
+  transition: box-shadow 0.18s ease, background 0.18s ease;
+}
+.field::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+.field:focus {
+  box-shadow: 0 0 0 4px var(--accent-ring);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  border-radius: 9999px;
+  box-shadow: 0 10px 28px var(--accent-ring);
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.btn-primary:active {
+  transform: translatey(1px) scale(0.99);
+}
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-ghost {
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 9999px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  transition: filter 0.15s ease;
+}
+.btn-ghost:hover {
+  filter: brightness(1.05);
+}
+
+/* ---------------------------------------------------------------
+   Special display text
+---------------------------------------------------------------- */
+.gradient-text {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2), var(--accent));
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 220% center;
+  }
+}

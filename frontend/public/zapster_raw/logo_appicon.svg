@@ -1,0 +1,22 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#11151F"/>
+      <stop offset="1" stop-color="#0B0E16"/>
+    </linearGradient>
+    <linearGradient id="mk" x1="150" y1="120" x2="362" y2="404" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3B6EF6"/>
+      <stop offset="0.55" stop-color="#5B86FF"/>
+      <stop offset="1" stop-color="#7B5BFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="114" fill="url(#bg)"/>
+  <g transform="translate(76 70) scale(0.70)">
+    <path fill="url(#mk)" fill-rule="evenodd" d="
+      M156 92 L210 180 L256 132 L302 180 L356 92 L374 204
+      C374 204 398 246 398 296 C398 362 332 426 256 448
+      C180 426 114 362 114 296 C114 246 138 204 138 204 Z
+      M272 168 L210 286 L250 286 L238 374 L306 252 L264 252 L290 168 Z
+    "/>
+  </g>
+</svg>
