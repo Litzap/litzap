@@ -6,6 +6,11 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # These NEXT_PUBLIC_* values are intentionally public (browser-exposed by design):
+  # RPC URL, on-chain contract addresses, and the Privy *public* app id. They are
+  # inlined into client JS as expected. RELAYER_PK is deliberately NOT listed here —
+  # it stays scanned and is only ever read server-side in app/api/gas/route.ts.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_LITEFORGE_RPC,NEXT_PUBLIC_REGISTRY,NEXT_PUBLIC_PAY,NEXT_PUBLIC_CAPSULE,NEXT_PUBLIC_SUBS,NEXT_PUBLIC_USDC,NEXT_PUBLIC_PRIVY_APP_ID,NEXT_PUBLIC_ESCROW"
 
 # Official Next.js runtime — handles SSR, API routes, and image optimization
 [[plugins]]
