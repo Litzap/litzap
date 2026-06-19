@@ -42,7 +42,7 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
       if (!authenticated || !addr || !isLive) return;
       try {
         const existing = await nameOfAddress(addr);
-        if (existing) signIn({ method: "email", username: existing, email: user?.email?.address, socials: {}, address: addr });
+        if (existing) signIn({ method: "email", username: existing, email: user?.email?.address, socials: { x: user?.twitter?.username ?? undefined, discord: user?.discord?.username ?? undefined }, address: addr });
       } catch {}
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,6 +83,17 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
     }
   }
 
+  // Sign in directly with a social — verifies the handle at login, so any gift
+  // sent to that handle is immediately claimable once they pick a ZapTag.
+  async function social(provider: "twitter" | "discord") {
+    setErr("");
+    try {
+      await initOAuth({ provider });
+    } catch (e) {
+      setErr(errText(e));
+    }
+  }
+
   function wallet() {
     setErr("");
     // Privy's login handles wallet connect + signature → real authentication.
@@ -109,7 +120,7 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
       await fetch("/api/gas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ address: addr }) }).catch(() => {});
       if (isLive) await registerName(u);
       const method = user?.wallet?.walletClientType && user.wallet.walletClientType !== "privy" ? "wallet" : "email";
-      signIn({ method, username: u, email: user?.email?.address, socials: {}, address: addr });
+      signIn({ method, username: u, email: user?.email?.address, socials: { x: user?.twitter?.username ?? undefined, discord: user?.discord?.username ?? undefined }, address: addr });
     } catch (e) {
       setErr(errText(e));
     } finally {
@@ -214,9 +225,18 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
                 <button onClick={google} className="mb-2.5 flex w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-text" style={{ background: "var(--field)" }}>
                   <Icon name="globe" size={18} className="text-accent" /> Continue with Google
                 </button>
+                <div className="mb-2.5 grid grid-cols-2 gap-2.5">
+                  <button onClick={() => social("twitter")} className="flex items-center justify-center gap-2 rounded-full px-4 py-3.5 text-sm font-semibold text-text" style={{ background: "var(--field)" }}>
+                    <Icon name="x" size={16} className="text-accent" /> X
+                  </button>
+                  <button onClick={() => social("discord")} className="flex items-center justify-center gap-2 rounded-full px-4 py-3.5 text-sm font-semibold text-text" style={{ background: "var(--field)" }}>
+                    <Icon name="discord" size={16} className="text-accent" /> Discord
+                  </button>
+                </div>
                 <button onClick={wallet} className="btn-ghost flex w-full items-center justify-center gap-2 px-5 py-3.5 text-sm">
                   <Icon name="wallet" size={18} /> Connect a wallet
                 </button>
+                <p className="mt-3 text-center text-[11px] text-muted">Got a gift on X or Discord? Sign in with it to claim.</p>
 
                 {err && <p className="mt-3 text-xs text-red-400">{err}</p>}
               </motion.div>
