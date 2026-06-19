@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 const ORBS = [
   { size: 560, top: "-12%", left: "-8%", c: "var(--accent-ring)", x: 70, y: 50, d: 20 },
@@ -37,6 +38,19 @@ function Motif({ kind, s }: { kind: string; s: number }) {
 }
 
 export function MotionBackground() {
+  // Hold the background completely still on phones (and for reduced-motion users)
+  // so the mobile view doesn't drift around. Desktop keeps the gentle drift.
+  const reduce = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const still = reduce || isMobile;
+
   // Drop a designed 3D scene in by setting NEXT_PUBLIC_SPLINE_URL (publish a scene
   // on spline.design → "Embed" → paste the URL). Falls back to the animated mesh.
   const spline = process.env.NEXT_PUBLIC_SPLINE_URL;
@@ -72,8 +86,8 @@ export function MotionBackground() {
           key={i}
           className="absolute rounded-full blur-[100px]"
           style={{ width: o.size, height: o.size, top: o.top, left: o.left, right: o.right, bottom: o.bottom, background: `radial-gradient(closest-side, ${o.c}, transparent)` }}
-          animate={{ x: [0, o.x, 0], y: [0, o.y, 0], scale: [1, 1.12, 1] }}
-          transition={{ duration: o.d, repeat: Infinity, ease: "easeInOut" }}
+          animate={still ? undefined : { x: [0, o.x, 0], y: [0, o.y, 0], scale: [1, 1.12, 1] }}
+          transition={still ? undefined : { duration: o.d, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
 
@@ -83,8 +97,8 @@ export function MotionBackground() {
           key={`m${i}`}
           className="absolute"
           style={{ top: m.top, left: m.left, right: m.right, bottom: m.bottom, opacity: 0.12 }}
-          animate={{ y: [0, -18, 0], rotate: [0, m.kind === "bolt" ? 8 : 12, 0] }}
-          transition={{ duration: m.d, repeat: Infinity, ease: "easeInOut", delay: m.delay }}
+          animate={still ? undefined : { y: [0, -18, 0], rotate: [0, m.kind === "bolt" ? 8 : 12, 0] }}
+          transition={still ? undefined : { duration: m.d, repeat: Infinity, ease: "easeInOut", delay: m.delay }}
         >
           <Motif kind={m.kind} s={m.s} />
         </motion.div>
