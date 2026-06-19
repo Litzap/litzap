@@ -9,6 +9,8 @@ import { Icon, type IconName } from "@/components/Icon";
 import { Zapster } from "@/components/Zapster";
 import { TxRow } from "./ui";
 import { AskZapster } from "./AskZapster";
+import { ConnectSocials } from "./ConnectSocials";
+import { ClaimInbox } from "./ClaimInbox";
 
 const ACTIONS: { id: "send" | "request" | "receive"; icon: IconName; label: string }[] = [
   { id: "send", icon: "send", label: "Send" },
@@ -40,6 +42,8 @@ export function Home() {
         <Zapster mood="idle" size={92} />
       </div>
 
+      <ClaimInbox />
+
       {/* real on-chain balance */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="panel overflow-hidden p-7">
         <p className="text-xs uppercase tracking-[0.18em] text-muted">Balance · on LitVM</p>
@@ -66,6 +70,8 @@ export function Home() {
       </motion.div>
 
       <AskZapster />
+
+      <ConnectSocials />
 
       <div>
         <div className="mb-3 flex items-center justify-between">

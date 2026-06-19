@@ -45,6 +45,75 @@ export const erc20Abi = [
   { type: "function", name: "allowance", stateMutability: "view", inputs: [{ name: "owner", type: "address" }, { name: "spender", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
 ] as const;
 
+export const escrowAbi = [
+  {
+    type: "function",
+    name: "createEscrow",
+    stateMutability: "payable",
+    inputs: [
+      { name: "token", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "recipientKey", type: "bytes32" },
+      { name: "expiry", type: "uint64" },
+      { name: "note", type: "string" },
+    ],
+    outputs: [{ name: "id", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "claim",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "id", type: "uint256" },
+      { name: "to", type: "address" },
+      { name: "sig", type: "bytes" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "refund",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "id", type: "uint256" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "getEscrow",
+    stateMutability: "view",
+    inputs: [{ name: "id", type: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "from", type: "address" },
+          { name: "token", type: "address" },
+          { name: "amount", type: "uint256" },
+          { name: "expiry", type: "uint64" },
+          { name: "recipientKey", type: "bytes32" },
+          { name: "settled", type: "bool" },
+        ],
+      },
+    ],
+  },
+  { type: "function", name: "nextId", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  {
+    type: "event",
+    name: "EscrowCreated",
+    anonymous: false,
+    inputs: [
+      { name: "id", type: "uint256", indexed: true },
+      { name: "from", type: "address", indexed: true },
+      { name: "recipientKey", type: "bytes32", indexed: true },
+      { name: "token", type: "address", indexed: false },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "expiry", type: "uint64", indexed: false },
+      { name: "note", type: "string", indexed: false },
+    ],
+  },
+] as const;
+
 export const registryAbi = [
   {
     type: "function",
