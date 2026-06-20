@@ -22,10 +22,12 @@ export function ClaimInbox() {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
+  // email may come from an email login (user.email) OR a Google login (user.google.email)
+  const email = user?.email?.address ?? user?.google?.email ?? undefined;
   const keys: `0x${string}`[] = [];
   if (user?.twitter?.username) keys.push(recipientKey("x", user.twitter.username));
   if (user?.discord?.username) keys.push(recipientKey("discord", user.discord.username));
-  if (user?.email?.address) keys.push(recipientKey("email", user.email.address));
+  if (email) keys.push(recipientKey("email", email));
   const keySig = keys.join(",");
 
   const refresh = useCallback(() => {

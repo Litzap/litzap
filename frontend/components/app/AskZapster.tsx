@@ -31,13 +31,24 @@ const CLAIM_HOURS = 24;
 
 const GREET: Record<Tone, string> = {
   playful: "Zapster here. Tell me what to do — like “send 5 USDC to maya.zap”.",
-  balanced: "Hey, I'm Zapster. Tell me what to do — e.g. “send 5 USDC to maya.zap”.",
+  balanced: "Hi, I'm Zapster. Tell me what to do — e.g. “send 5 USDC to maya.zap”.",
   professional: "Zapster, your money assistant. Try “send 5 USDC to maya.zap”.",
 };
 const HELP: Record<Tone, string> = {
   playful: "Just tell me: “send 20 to maya.zap”, “pay @jules 10 on x”, “request 15 from sam”, or “what's my balance”. I'll set it up — you confirm.",
   balanced: "I can send money, pay an X/Discord handle, request money, and check balances. Tell me in plain words and I'll prepare it for your confirmation.",
   professional: "I can execute payments, pay social handles, create requests, and report balances. State the instruction; I'll prepare it for confirmation.",
+};
+const FLAIR: Record<Tone, string> = { playful: "Too easy.", balanced: "Done.", professional: "Completed." };
+const CONFIRM_INTRO: Record<Tone, string> = {
+  playful: "Here's the plan — hit confirm and I'll zap it:",
+  balanced: "Here's what I'll do — confirm to run it on-chain:",
+  professional: "Please review and confirm this transaction:",
+};
+const CANCELLED: Record<Tone, string> = {
+  playful: "No worries — scrapped it.",
+  balanced: "Okay, cancelled.",
+  professional: "Cancelled.",
 };
 
 export function AskZapster() {
@@ -46,11 +57,11 @@ export function AskZapster() {
   const { data: usdc } = useBalance({ address, token: CONTRACTS.usdc !== ZERO ? CONTRACTS.usdc : undefined, query: { enabled: !!address && CONTRACTS.usdc !== ZERO } });
   const { data: ltc } = useBalance({ address });
 
-  const [tone, setTone] = useState<Tone>("playful");
+  const [tone, setTone] = useState<Tone>("balanced");
   const [color, setColor] = useState(COLORS[0]);
   const [showCustomize, setShowCustomize] = useState(false);
   const [input, setInput] = useState("");
-  const [log, setLog] = useState<Msg[]>([{ who: "zap", text: GREET.playful }]);
+  const [log, setLog] = useState<Msg[]>([{ who: "zap", text: GREET.balanced }]);
   const [pending, setPending] = useState<Action | null>(null);
   const [busy, setBusy] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -128,7 +139,7 @@ export function AskZapster() {
       recipientType, recipient, tokenSym, amount, note,
       summary: `${isRequest ? "Request" : "Send"} ${tokLabel} ${isRequest ? "from" : "to"} ${dest}${note ? ` · ${note}` : ""}`,
     };
-    setLog((l) => [...l, { who: "zap", text: "Here's what I'll do — confirm and I'll run it on-chain:" }]);
+    setLog((l) => [...l, { who: "zap", text: CONFIRM_INTRO[tone] }]);
     setPending(action);
   }
 
@@ -166,7 +177,7 @@ export function AskZapster() {
         const hash = token.native ? await payNative(to, String(a.amount), a.note) : await payErc20(token.address, to, units, a.note);
         addTx({ dir: "out", party: a.recipientType === "tag" ? `${a.recipient}.zap` : a.recipient, amount: a.amount, token: a.tokenSym, note: a.note, hash });
         setPending(null);
-        say(`Done — sent ${a.tokenSym === "USDC" ? `$${a.amount.toFixed(2)}` : `${a.amount} ${a.tokenSym}`}.`, hash);
+        say(`Sent ${a.tokenSym === "USDC" ? `$${a.amount.toFixed(2)}` : `${a.amount} ${a.tokenSym}`}. ${FLAIR[tone]}`, hash);
       } else {
         if (CONTRACTS.escrow === ZERO) throw new Error("Pay-by-social isn't configured yet.");
         const key = recipientKey(a.recipientType as SocialKind, a.recipient);
@@ -248,7 +259,7 @@ export function AskZapster() {
               <div className="font-display text-sm font-bold text-text">{pending.summary}</div>
               <div className="mt-2.5 flex gap-2">
                 <button onClick={confirm} disabled={busy} className="btn-primary flex-1 py-2.5 text-sm">{busy ? "Working…" : "Confirm"}</button>
-                <button onClick={() => { setPending(null); say("Okay, cancelled."); }} disabled={busy} className="flex-1 rounded-full py-2.5 text-sm font-semibold" style={{ background: "var(--field)", color: "var(--muted)" }}>Cancel</button>
+                <button onClick={() => { setPending(null); say(CANCELLED[tone]); }} disabled={busy} className="flex-1 rounded-full py-2.5 text-sm font-semibold" style={{ background: "var(--field)", color: "var(--muted)" }}>Cancel</button>
               </div>
             </motion.div>
           )}

@@ -15,11 +15,11 @@ const litvm = defineChain({
   rpcUrls: { default: { http: [RPC] } },
 });
 
-// Contract calls (USDC approve+pay, escrow, drops) need far more gas than a plain
-// transfer, plus the wallet UI keeps a safety buffer. Keep a healthy float so
-// sponsored users can actually complete on-chain actions.
-const MIN = parseEther("0.02"); // top up whenever below this
-const DRIP = parseEther("0.05"); // amount to send each top-up
+// Real gas on LiteForge is tiny (<0.001/tx), but the wallet UI keeps a safety
+// buffer and ERC-20 flows are two txs (approve + pay). 0.02 comfortably covers a
+// full session while stretching the sponsor wallet's funds across many users.
+const MIN = parseEther("0.01"); // top up whenever below this
+const DRIP = parseEther("0.02"); // amount to send each top-up
 
 export async function POST(req: Request) {
   try {

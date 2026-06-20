@@ -45,10 +45,11 @@ export async function POST(req: Request) {
     }
     const user = await privy.getUser(userId);
 
+    const email = user.email?.address ?? user.google?.email ?? undefined;
     const myKeys: string[] = [];
     if (user.twitter?.username) myKeys.push(recipientKey("x", user.twitter.username));
     if (user.discord?.username) myKeys.push(recipientKey("discord", user.discord.username));
-    if (user.email?.address) myKeys.push(recipientKey("email", user.email.address));
+    if (email) myKeys.push(recipientKey("email", email));
     if (myKeys.length === 0) {
       return NextResponse.json({ error: "Connect the matching X / Discord first." }, { status: 403 });
     }

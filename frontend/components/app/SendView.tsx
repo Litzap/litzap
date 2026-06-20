@@ -11,6 +11,7 @@ import { payNative, payErc20, resolveName, createSocialEscrow } from "@/lib/onch
 import { recipientKey, type SocialKind } from "@/lib/social";
 import { Icon, type IconName } from "@/components/Icon";
 import { Zapster, type Mood } from "@/components/Zapster";
+import { ScanModal } from "./ScanModal";
 
 type Kind = "tag" | "email" | "x" | "discord";
 const TABS: { kind: Kind; label: string; icon: IconName; placeholder: string }[] = [
@@ -33,6 +34,7 @@ export function SendView() {
   const [note, setNote] = useState("");
   const [mood, setMood] = useState<Mood>("idle");
   const [busy, setBusy] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; msg: string; hash?: string } | null>(null);
 
   const token = TOKENS.find((t) => t.symbol === tokenSym)!;
@@ -49,6 +51,17 @@ export function SendView() {
   const balText = token.symbol === "USDC" ? `$${balNum.toFixed(2)}` : `${balNum.toFixed(4)} ${token.symbol}`;
   const amtNum = parseFloat(amount) || 0;
   const overBalance = amtNum > balNum;
+
+  function handleScan(text: string) {
+    setScanning(false);
+    // a LitZap QR encodes a pay link like https://litzap.xyz/u/<handle>
+    let val = text.trim();
+    const m = val.match(/\/u\/([a-z0-9_]+)/i);
+    if (m) val = m[1];
+    setKind("tag");
+    setTo(val);
+    setResult(null);
+  }
 
   async function submit() {
     setResult(null);
@@ -126,7 +139,12 @@ export function SendView() {
           ))}
         </div>
 
-        <input value={to} onChange={(e) => setTo(e.target.value)} placeholder={tab.placeholder} className="field mb-4 px-5 py-3.5 text-sm" />
+        <div className="mb-4 flex items-center gap-2 rounded-full pr-2" style={{ background: "var(--field)" }}>
+          <input value={to} onChange={(e) => setTo(e.target.value)} placeholder={tab.placeholder} className="w-full bg-transparent px-5 py-3.5 text-sm outline-none" />
+          <button type="button" onClick={() => setScanning(true)} title="Scan to pay" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style={{ background: "var(--surface-2)", color: "var(--accent)" }}>
+            <Icon name="scan" size={18} />
+          </button>
+        </div>
 
         {/* amount + token */}
         <div className="flex items-center gap-2 rounded-full pr-2" style={{ background: "var(--field)" }}>
@@ -218,6 +236,8 @@ export function SendView() {
       <div className="hidden items-start justify-center md:flex">
         <Zapster mood={mood} size={220} />
       </div>
+
+      {scanning && <ScanModal onResult={handleScan} onClose={() => setScanning(false)} />}
     </div>
   );
 }

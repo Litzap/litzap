@@ -8,7 +8,6 @@ import { CONTRACTS, ZERO } from "@/lib/config";
 import { Icon, type IconName } from "@/components/Icon";
 import { Zapster } from "@/components/Zapster";
 import { TxRow } from "./ui";
-import { AskZapster } from "./AskZapster";
 import { ConnectSocials } from "./ConnectSocials";
 import { ClaimInbox } from "./ClaimInbox";
 import { RequestInbox } from "./RequestInbox";
@@ -70,8 +69,6 @@ export function Home() {
           ))}
         </div>
       </motion.div>
-
-      <AskZapster />
 
       <ConnectSocials />
 

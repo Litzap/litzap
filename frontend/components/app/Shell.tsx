@@ -14,6 +14,7 @@ import { ReceiveView } from "./ReceiveView";
 import { ActivityView } from "./ActivityView";
 import { DropsView } from "./DropsView";
 import { NoticeModal } from "./NoticeModal";
+import { FloatingZapster } from "./FloatingZapster";
 
 const NAV: { id: View; icon: IconName; label: string }[] = [
   { id: "home", icon: "home", label: "Home" },
@@ -52,6 +53,7 @@ export function Shell() {
   return (
     <div className="md:grid md:grid-cols-[248px_1fr]">
       <NoticeModal />
+      <FloatingZapster />
       {/* desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen flex-col justify-between p-4 md:flex">
         <div>

@@ -185,8 +185,7 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
             {step === "profile" && !nameChecked ? (
               <motion.div key="restoring" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-8 text-center">
                 <Zapster mood="idle" size={120} />
-                <p className="font-display mt-4 text-lg font-bold text-text">Getting your account ready…</p>
-                <p className="mt-1 text-sm text-muted">One moment while we find your ZapTag.</p>
+                <p className="font-display mt-4 text-lg font-bold text-text">Signing you in…</p>
               </motion.div>
             ) : step === "profile" ? (
               <motion.div key="profile" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }}>

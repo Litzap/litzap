@@ -102,10 +102,6 @@ export type PendingEscrow = {
 
 const publicClient = createPublicClient({ chain: litvm, transport: http() });
 
-const ESCROW_CREATED = parseAbiItem(
-  "event EscrowCreated(uint256 indexed id, address indexed from, bytes32 indexed recipientKey, address token, uint256 amount, uint64 expiry, string note)"
-);
-
 /** Lock funds for an off-chain identity. `amount` is in base units. ERC-20 is approved first. */
 export async function createSocialEscrow(p: {
   token: `0x${string}`;
@@ -310,29 +306,24 @@ export async function hasClaimedDrop(code: string, who: `0x${string}`): Promise<
   }
 }
 
-/** Find open (unsettled, unexpired) escrows addressed to any of these identity keys. */
+/** Find open (unsettled, unexpired) escrows addressed to any of these identity keys.
+ *  Enumerates escrows directly (reliable on LiteForge) rather than relying on getLogs. */
 export async function fetchPendingClaims(recipientKeys: `0x${string}`[]): Promise<PendingEscrow[]> {
   if (CONTRACTS.escrow === ZERO || recipientKeys.length === 0) return [];
+  const want = new Set(recipientKeys.map((k) => k.toLowerCase()));
   try {
-    const logs = await publicClient.getLogs({
-      address: CONTRACTS.escrow,
-      event: ESCROW_CREATED,
-      args: { recipientKey: recipientKeys },
-      fromBlock: 0n,
-      toBlock: "latest",
-    });
+    const n = Number(await readContract(wagmiConfig, { address: CONTRACTS.escrow, abi: escrowAbi, functionName: "nextId" }));
     const now = BigInt(Math.floor(Date.now() / 1000));
     const out: PendingEscrow[] = [];
-    for (const l of logs) {
-      const id = l.args.id as bigint;
+    for (let i = 1; i < n; i++) {
       const e = (await readContract(wagmiConfig, {
         address: CONTRACTS.escrow,
         abi: escrowAbi,
         functionName: "getEscrow",
-        args: [id],
+        args: [BigInt(i)],
       })) as { token: `0x${string}`; amount: bigint; expiry: bigint; recipientKey: `0x${string}`; settled: boolean; from: `0x${string}` };
-      if (!e.settled && now < e.expiry) {
-        out.push({ id, from: e.from, token: e.token, amount: e.amount, expiry: e.expiry, recipientKey: e.recipientKey, note: (l.args.note as string) ?? "" });
+      if (!e.settled && now < e.expiry && want.has(e.recipientKey.toLowerCase())) {
+        out.push({ id: BigInt(i), from: e.from, token: e.token, amount: e.amount, expiry: e.expiry, recipientKey: e.recipientKey, note: "" });
       }
     }
     return out;
