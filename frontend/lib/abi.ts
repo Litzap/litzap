@@ -15,6 +15,30 @@ export const payAbi = [
   },
   {
     type: "function",
+    name: "request",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "from", type: "address" },
+      { name: "token", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "note", type: "string" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "event",
+    name: "PaymentRequested",
+    anonymous: false,
+    inputs: [
+      { name: "to", type: "address", indexed: true },
+      { name: "from", type: "address", indexed: true },
+      { name: "token", type: "address", indexed: false },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "note", type: "string", indexed: false },
+    ],
+  },
+  {
+    type: "function",
     name: "createClaim",
     stateMutability: "payable",
     inputs: [
@@ -110,6 +134,59 @@ export const escrowAbi = [
       { name: "amount", type: "uint256", indexed: false },
       { name: "expiry", type: "uint64", indexed: false },
       { name: "note", type: "string", indexed: false },
+    ],
+  },
+] as const;
+
+export const dropsAbi = [
+  {
+    type: "function",
+    name: "createDrop",
+    stateMutability: "payable",
+    inputs: [
+      { name: "codeHash", type: "bytes32" },
+      { name: "token", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "count", type: "uint32" },
+      { name: "lucky", type: "bool" },
+      { name: "expiry", type: "uint64" },
+    ],
+    outputs: [],
+  },
+  { type: "function", name: "claim", stateMutability: "nonpayable", inputs: [{ name: "codeHash", type: "bytes32" }], outputs: [] },
+  { type: "function", name: "reclaim", stateMutability: "nonpayable", inputs: [{ name: "codeHash", type: "bytes32" }], outputs: [] },
+  {
+    type: "function",
+    name: "getDrop",
+    stateMutability: "view",
+    inputs: [{ name: "codeHash", type: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "creator", type: "address" },
+          { name: "token", type: "address" },
+          { name: "total", type: "uint256" },
+          { name: "remaining", type: "uint256" },
+          { name: "count", type: "uint32" },
+          { name: "claimed", type: "uint32" },
+          { name: "lucky", type: "bool" },
+          { name: "expiry", type: "uint64" },
+          { name: "settled", type: "bool" },
+        ],
+      },
+    ],
+  },
+  { type: "function", name: "claimedBy", stateMutability: "view", inputs: [{ name: "", type: "bytes32" }, { name: "", type: "address" }], outputs: [{ name: "", type: "bool" }] },
+  {
+    type: "event",
+    name: "DropClaimed",
+    anonymous: false,
+    inputs: [
+      { name: "codeHash", type: "bytes32", indexed: true },
+      { name: "by", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
     ],
   },
 ] as const;

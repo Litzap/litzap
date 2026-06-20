@@ -11,6 +11,7 @@ import { TxRow } from "./ui";
 import { AskZapster } from "./AskZapster";
 import { ConnectSocials } from "./ConnectSocials";
 import { ClaimInbox } from "./ClaimInbox";
+import { RequestInbox } from "./RequestInbox";
 
 const ACTIONS: { id: "send" | "request" | "receive"; icon: IconName; label: string }[] = [
   { id: "send", icon: "send", label: "Send" },
@@ -43,6 +44,7 @@ export function Home() {
       </div>
 
       <ClaimInbox />
+      <RequestInbox />
 
       {/* real on-chain balance */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="panel overflow-hidden p-7">

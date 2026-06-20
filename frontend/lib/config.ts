@@ -29,6 +29,7 @@ export const CONTRACTS = {
   capsule: (process.env.NEXT_PUBLIC_CAPSULE ?? ZERO) as `0x${string}`,
   subs: (process.env.NEXT_PUBLIC_SUBS ?? ZERO) as `0x${string}`,
   escrow: (process.env.NEXT_PUBLIC_ESCROW ?? ZERO) as `0x${string}`,
+  drops: (process.env.NEXT_PUBLIC_DROPS ?? ZERO) as `0x${string}`,
   usdc: (process.env.NEXT_PUBLIC_USDC ?? ZERO) as `0x${string}`,
 };
 

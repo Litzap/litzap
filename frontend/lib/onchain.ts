@@ -1,7 +1,7 @@
 import { writeContract, readContract, waitForTransactionReceipt } from "wagmi/actions";
-import { parseEther, createPublicClient, http, parseAbiItem, decodeEventLog } from "viem";
+import { parseEther, createPublicClient, http, parseAbiItem, decodeEventLog, keccak256, toBytes } from "viem";
 import { wagmiConfig, CONTRACTS, NATIVE, ZERO, litvm } from "./config";
-import { registryAbi, payAbi, erc20Abi, escrowAbi } from "./abi";
+import { registryAbi, payAbi, erc20Abi, escrowAbi, dropsAbi } from "./abi";
 
 /** Read who owns a ZapTag (zero address = available). */
 export async function resolveName(name: string): Promise<`0x${string}`> {
@@ -173,6 +173,141 @@ export async function refundEscrow(id: bigint): Promise<`0x${string}`> {
   });
   await waitForTransactionReceipt(wagmiConfig, { hash });
   return hash;
+}
+
+// ---------------------------------------------------------------
+// On-chain requests (LitZapPay.request emits a signal; no funds move)
+// ---------------------------------------------------------------
+
+const PAYMENT_REQUESTED = parseAbiItem(
+  "event PaymentRequested(address indexed to, address indexed from, address token, uint256 amount, string note)"
+);
+
+export type IncomingRequest = {
+  to: `0x${string}`;     // who wants to be paid
+  from: `0x${string}`;   // who is being asked (you)
+  token: `0x${string}`;
+  amount: bigint;
+  note: string;
+};
+
+/** Ask `payer` to pay you `amount` of `token`. Emits an on-chain request signal. */
+export async function requestPayment(payer: `0x${string}`, token: `0x${string}`, amount: bigint, note = ""): Promise<`0x${string}`> {
+  const hash = await writeContract(wagmiConfig, {
+    address: CONTRACTS.pay,
+    abi: payAbi,
+    functionName: "request",
+    args: [payer, token, amount, note],
+  });
+  await waitForTransactionReceipt(wagmiConfig, { hash });
+  return hash;
+}
+
+/** Requests addressed to `me` (i.e. people asking me to pay them). */
+export async function fetchIncomingRequests(me: `0x${string}`): Promise<IncomingRequest[]> {
+  if (CONTRACTS.pay === ZERO) return [];
+  try {
+    const logs = await publicClient.getLogs({
+      address: CONTRACTS.pay,
+      event: PAYMENT_REQUESTED,
+      args: { from: me },
+      fromBlock: 0n,
+      toBlock: "latest",
+    });
+    return logs.map((l) => ({
+      to: l.args.to as `0x${string}`,
+      from: l.args.from as `0x${string}`,
+      token: l.args.token as `0x${string}`,
+      amount: l.args.amount as bigint,
+      note: (l.args.note as string) ?? "",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------
+// On-chain Drops (LitZapDrops)
+// ---------------------------------------------------------------
+
+export type DropInfo = {
+  creator: `0x${string}`;
+  token: `0x${string}`;
+  total: bigint;
+  remaining: bigint;
+  count: number;
+  claimed: number;
+  lucky: boolean;
+  expiry: bigint;
+  settled: boolean;
+};
+
+export const codeHash = (code: string): `0x${string}` => keccak256(toBytes(code.toLowerCase()));
+
+/** Fund a drop. `amount` is base units. ERC-20 is approved first. */
+export async function createDropOnchain(p: {
+  code: string;
+  token: `0x${string}`;
+  native: boolean;
+  amount: bigint;
+  count: number;
+  lucky: boolean;
+  expiry: bigint;
+}): Promise<`0x${string}`> {
+  const { code, token, native, amount, count, lucky, expiry } = p;
+  if (!native) {
+    const approveHash = await writeContract(wagmiConfig, {
+      address: token, abi: erc20Abi, functionName: "approve", args: [CONTRACTS.drops, amount],
+    });
+    await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
+  }
+  const hash = await writeContract(wagmiConfig, {
+    address: CONTRACTS.drops,
+    abi: dropsAbi,
+    functionName: "createDrop",
+    args: [codeHash(code), native ? NATIVE : token, amount, count, lucky, expiry],
+    value: native ? amount : 0n,
+  });
+  await waitForTransactionReceipt(wagmiConfig, { hash });
+  return hash;
+}
+
+export async function claimDropOnchain(code: string): Promise<{ hash: `0x${string}`; amount?: bigint }> {
+  const hash = await writeContract(wagmiConfig, {
+    address: CONTRACTS.drops, abi: dropsAbi, functionName: "claim", args: [codeHash(code)],
+  });
+  const receipt = await waitForTransactionReceipt(wagmiConfig, { hash });
+  let amount: bigint | undefined;
+  for (const log of receipt.logs) {
+    try {
+      const d = decodeEventLog({ abi: dropsAbi, data: log.data, topics: log.topics });
+      if (d.eventName === "DropClaimed") { amount = (d.args as { amount: bigint }).amount; break; }
+    } catch { /* not our event */ }
+  }
+  return { hash, amount };
+}
+
+export async function getDropOnchain(code: string): Promise<DropInfo | null> {
+  if (CONTRACTS.drops === ZERO) return null;
+  try {
+    const d = (await readContract(wagmiConfig, {
+      address: CONTRACTS.drops, abi: dropsAbi, functionName: "getDrop", args: [codeHash(code)],
+    })) as DropInfo;
+    if (!d.creator || d.creator === ZERO) return null;
+    return d;
+  } catch {
+    return null;
+  }
+}
+
+export async function hasClaimedDrop(code: string, who: `0x${string}`): Promise<boolean> {
+  try {
+    return (await readContract(wagmiConfig, {
+      address: CONTRACTS.drops, abi: dropsAbi, functionName: "claimedBy", args: [codeHash(code), who],
+    })) as boolean;
+  } catch {
+    return false;
+  }
 }
 
 /** Find open (unsettled, unexpired) escrows addressed to any of these identity keys. */

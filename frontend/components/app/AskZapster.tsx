@@ -7,7 +7,7 @@ import { isAddress, parseUnits } from "viem";
 import { useApp, TOKENS } from "@/lib/store";
 import { useEmbeddedWallet } from "@/lib/wallet";
 import { CONTRACTS, ZERO, isLive } from "@/lib/config";
-import { payNative, payErc20, resolveName, createSocialEscrow } from "@/lib/onchain";
+import { payNative, payErc20, resolveName, createSocialEscrow, requestPayment } from "@/lib/onchain";
 import { recipientKey, type SocialKind } from "@/lib/social";
 import { ZapsterFace } from "@/components/Zapster";
 import { Icon } from "@/components/Icon";
@@ -41,7 +41,7 @@ const HELP: Record<Tone, string> = {
 };
 
 export function AskZapster() {
-  const { txs, session, addTx, request } = useApp();
+  const { txs, session, addTx } = useApp();
   const address = useEmbeddedWallet();
   const { data: usdc } = useBalance({ address, token: CONTRACTS.usdc !== ZERO ? CONTRACTS.usdc : undefined, query: { enabled: !!address && CONTRACTS.usdc !== ZERO } });
   const { data: ltc } = useBalance({ address });
@@ -138,15 +138,23 @@ export function AskZapster() {
     setBusy(true);
     try {
       const token = TOKENS.find((t) => t.symbol === a.tokenSym)!;
-      if (a.kind === "request") {
-        request({ from: a.recipient, amount: a.amount, token: a.tokenSym, note: a.note });
-        setPending(null);
-        say(`Requested ${a.tokenSym === "USDC" ? `$${a.amount.toFixed(2)}` : `${a.amount} ${a.tokenSym}`} from ${a.recipient}.`);
-        return;
-      }
       if (!address) throw new Error("Your wallet is still loading — try again in a second.");
       if (!isLive) throw new Error("On-chain contracts aren't configured.");
       const units = parseUnits(String(a.amount), token.decimals);
+
+      if (a.kind === "request") {
+        if (a.recipientType !== "tag" && a.recipientType !== "address") throw new Error("I can only request from a name.zap or address.");
+        let payer: `0x${string}`;
+        if (a.recipientType === "address" && isAddress(a.recipient)) payer = a.recipient as `0x${string}`;
+        else {
+          payer = await resolveName(a.recipient.toLowerCase());
+          if (!payer || payer === ZERO) throw new Error(`${a.recipient}.zap isn't on LitZap yet.`);
+        }
+        const hash = await requestPayment(payer, token.native ? ZERO : token.address, units, a.note);
+        setPending(null);
+        say(`Requested ${a.tokenSym === "USDC" ? `$${a.amount.toFixed(2)}` : `${a.amount} ${a.tokenSym}`} from ${a.recipient}.`, hash);
+        return;
+      }
 
       if (a.kind === "send") {
         let to: `0x${string}`;

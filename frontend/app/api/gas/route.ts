@@ -15,8 +15,11 @@ const litvm = defineChain({
   rpcUrls: { default: { http: [RPC] } },
 });
 
-const MIN = parseEther("0.0005"); // top up only if below this
-const DRIP = parseEther("0.003"); // amount to send
+// Contract calls (USDC approve+pay, escrow, drops) need far more gas than a plain
+// transfer, plus the wallet UI keeps a safety buffer. Keep a healthy float so
+// sponsored users can actually complete on-chain actions.
+const MIN = parseEther("0.02"); // top up whenever below this
+const DRIP = parseEther("0.05"); // amount to send each top-up
 
 export async function POST(req: Request) {
   try {
