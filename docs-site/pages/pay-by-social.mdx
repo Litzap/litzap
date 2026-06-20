@@ -1,0 +1,56 @@
+import { Steps, Callout } from "nextra/components";
+
+# Pay-by-social
+
+Pay-by-social is LitZap's signature capability: **send money to someone by their X, Discord, or email — even if they've never used LitZap or crypto.** The funds are held safely on-chain and released only to the verified owner of that identity, or returned to the sender if unclaimed.
+
+This is powered by the **LitZapEscrow** contract ([`0x315F…fE30`](https://liteforge.hub.caldera.xyz/address/0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30)).
+
+## The flow
+
+<Steps>
+
+### Sender pays a handle
+
+You enter, say, `x:flamingo` and an amount. LitZap computes a **recipient key** — a hash of the identity, `keccak256("x:flamingo")` — so the on-chain record reveals nothing about who the recipient is beyond that hash.
+
+### Funds lock in escrow
+
+The amount (USDC or zkLTC) is locked in `LitZapEscrow` against that recipient key, with an **expiry** (e.g. 7 days). The sender gets a shareable claim link to pass along if they want.
+
+### Recipient shows up
+
+The recipient signs in to LitZap with that same X / Discord / email — which quietly creates their wallet — and a **"Money waiting for you"** prompt appears.
+
+### Ownership is verified
+
+LitZap's verification signer confirms, through the recipient's own social login, that they truly own the handle. It then signs a release **bound to the recipient's wallet address**.
+
+### Recipient claims
+
+The recipient submits the claim with that signature. The contract checks the signature against its trusted signer and pays out to the verified address.
+
+### Or it auto-refunds
+
+If nobody claims before expiry, the sender calls `refund` and gets their money back. Funds are never stuck.
+
+</Steps>
+
+## Why it's safe
+
+<Callout type="info">
+  The release signature is over `(chainId, escrow, escrowId, recipientAddress)`. Because it's bound to the **recipient's address**, it cannot be replayed, redirected, or front-run by a bystander watching the chain.
+</Callout>
+
+- **No premature custody** — only the recipient who proves the handle can claim; until then funds sit in escrow.
+- **No theft** — the signer authorizes a payout to one specific verified address only.
+- **No stuck funds** — every escrow is refundable by the sender after expiry.
+- **The signer can't rug** — it can only authorize releases to verified claimants, never to itself, and is rotatable by the contract owner.
+
+## What the recipient experiences
+
+For someone brand-new to crypto, the whole thing feels like: *"Someone sent me money on X → I signed in → I tapped Claim → it's in my balance."* The wallet creation, key management, and on-chain release all happen underneath. **Getting paid is the onboarding.**
+
+## A composable primitive
+
+`LitZapEscrow` is permissionless: any person, business, or other LitVM project can create escrows against an identity and rely on the same verified-release mechanism. See [Build on LitZap](/build-on-litzap).

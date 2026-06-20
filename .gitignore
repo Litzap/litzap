@@ -13,6 +13,8 @@ node_modules/
 frontend/.next/
 frontend/out/
 frontend/.bannerfonts/
+docs-site/.next/
+docs-site/out/
 
 # hardhat / contracts build output
 contracts/artifacts/

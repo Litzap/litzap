@@ -1,0 +1,57 @@
+import { Callout } from "nextra/components";
+
+# Roadmap
+
+Our north star: **let anyone get paid by anyone — and turn it into real money.** The roadmap follows the wedge → moat → magic path from [Why LitZap](/why-different).
+
+<Callout type="info">
+  Honest by default. Items marked **Live** are deployed and verifiable on LiteForge today. Everything else is planned work, in roughly the order we intend to tackle it — not a promise of dates.
+</Callout>
+
+## Live today
+
+- Email / Google / X / Discord sign-in with self-custodied embedded wallets
+- `name.zap` on-chain identity
+- USDC & zkLTC payments and requests
+- **Pay-by-social** escrow (X / Discord / email) with auto-refund
+- Drops (group payments)
+- Zapster, the in-app money companion
+- Five deployed contracts ([see Contracts](/contracts))
+
+## Near term — stabilise & launch
+
+- Hardening and polish across all flows for a confident **testnet launch**
+- Verified X / Discord profile linking refinements
+- Clearer claim discovery and notifications
+- Ecosystem listing and Builders Program participation
+
+## Mid term — the moat
+
+- **Off-ramp:** convert USDC into local money (mobile money, bank transfer) through partners — the piece that makes LitZap real money, not just crypto
+- **On-ramp:** simple ways to fund a LitZap balance
+- **Receive from / send to other chains** for broader reach
+- **Partner SDK & API:** let businesses and LitVM projects pay by name/handle, accept payments, and resolve identities (see [Build on LitZap](/build-on-litzap))
+
+## Longer term — the magic
+
+- **Agentic Zapster:** move money with plain language — split bills, schedule payments, open escrows — executed safely on top of primitives that already work
+- **Savings & yield:** make idle balances productive, with the complexity hidden
+- **Card & spend:** spend a LitZap balance in the real world
+
+## Exploring — privacy
+
+<Callout type="warning">
+  Stated honestly: LitVM (the L2) transactions are currently **public**, and LitZap does **not** offer private payments today. We will not claim privacy until it ships.
+</Callout>
+
+Litecoin's MWEB brings confidential transactions at the base-chain (L1) level. We're researching how to bring **optional privacy** to LitZap — for example shielded balances or confidential transfer amounts — in a way that's compatible with LitVM and doesn't compromise the non-custodial model. This is exploratory: a direction we believe in, not a feature we've built.
+
+## Mainnet readiness
+
+Before LitZap handles real value on mainnet, we intend to complete:
+
+- A **third-party security audit** of the contracts
+- Hardened key management for operational signers (multisig / KMS)
+- Production-grade gas and verification infrastructure
+
+We'd rather ship these in the right order than rush real money onto unaudited rails.

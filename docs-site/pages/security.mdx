@@ -1,0 +1,38 @@
+import { Callout } from "nextra/components";
+
+# Security & trust
+
+LitZap is built so that you trust the **contracts**, not the company. Here's exactly what is guaranteed by code, what relies on helper services, and the honest limits of each.
+
+## Non-custodial by design
+
+- Your wallet is **self-custodied** — you control the keys, created and bound to your login.
+- **Completed payments never sit in a LitZap contract.** They pass straight from sender to recipient.
+- The only funds ever held on-chain are **open escrows and claims**, and those are **always refundable by the sender** after expiry.
+
+## What's enforced by the contracts
+
+- **Fee ceiling.** The maximum protocol fee is hard-capped in code and cannot be raised beyond it. It is currently set to zero.
+- **Reentrancy protection** on payment and escrow paths.
+- **Pausability** for emergency response, owner-controlled.
+- **Address-bound escrow releases.** A claim signature is valid only for one specific recipient address, preventing replay and front-running.
+
+## The trust assumptions (stated plainly)
+
+<Callout type="warning">
+  We don't hide the parts that require trust. Here they are.
+</Callout>
+
+**The verification signer.** Pay-by-social relies on an off-chain signer that attests "this user owns this handle" and authorizes the matching release. Its power is strictly limited: it can **only** authorize a payout to a verified claimant's address — it cannot move funds to itself, drain escrows, or redirect a payment. It is rotatable by the contract owner. If it were ever offline, escrows still auto-refund to senders after expiry, so no funds are lost.
+
+**Gas sponsorship.** A relayer tops up wallets with small amounts of gas to smooth onboarding. This is a convenience LitZap currently funds on testnet — not an unconditional guarantee. (This is why we never claim "no gas.")
+
+**Operational keys.** The signer and relayer are operational keys held server-side and never exposed in the app. On testnet they are funded throwaway accounts. Hardening for mainnet (multisig / key management) is on the [Roadmap](/roadmap).
+
+## Honest status
+
+LitZap is in active development on **testnet**. The contracts are deployed and verifiable, the flows work end to end, and we are stabilising features ahead of a testnet launch. We have **not** completed a third-party security audit yet — an audit is a prerequisite before handling real value on mainnet, and it's on the roadmap. We'd rather state this clearly than imply a maturity we haven't earned.
+
+## Reporting an issue
+
+Found a vulnerability or a concern? Reach us via [GitHub](https://github.com/Litzap/litzap) or [@Litzap_xyz](https://x.com/Litzap_xyz). Responsible disclosure is genuinely appreciated.

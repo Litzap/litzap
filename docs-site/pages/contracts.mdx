@@ -1,0 +1,49 @@
+import { Callout } from "nextra/components";
+
+# Smart contracts
+
+All of LitZap's money logic lives in public, verifiable contracts on **LitVM / LiteForge** (chain `4441`). Every address below is live and can be inspected on the explorer.
+
+- **RPC:** `https://liteforge.rpc.caldera.xyz/http`
+- **Explorer:** `https://liteforge.hub.caldera.xyz`
+
+## Deployed contracts
+
+| Contract | Purpose | Address |
+| --- | --- | --- |
+| **LitZapRegistry** | `name.zap` identity — register, resolve, release | [`0x5F98A240De0a92620Fad513525c4F5f046b4A81D`](https://liteforge.hub.caldera.xyz/address/0x5F98A240De0a92620Fad513525c4F5f046b4A81D) |
+| **LitZapPay** | Direct payments, requests, and boomerang claims | [`0xE5bF48f6b6Ea117Cac3Fa7B5E466441778E28c9A`](https://liteforge.hub.caldera.xyz/address/0xE5bF48f6b6Ea117Cac3Fa7B5E466441778E28c9A) |
+| **LitZapEscrow** | Pay-by-social + hold-until-delivered escrow | [`0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30`](https://liteforge.hub.caldera.xyz/address/0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30) |
+| **LitZapSubscriptions** | Recurring payments (allowance-based) | [`0x9C4E9902173fB14A0CdC5B60F74E4Dbd55D5344B`](https://liteforge.hub.caldera.xyz/address/0x9C4E9902173fB14A0CdC5B60F74E4Dbd55D5344B) |
+| **LitZapCapsule** | On-chain collectibles (ERC-721) | [`0x3F7b5DC6687761A8B49bC57B33183EB5150180b0`](https://liteforge.hub.caldera.xyz/address/0x3F7b5DC6687761A8B49bC57B33183EB5150180b0) |
+
+**USDC (LiteForge):** [`0xd5118dEe968d1533B2A57aB66C266010AD8957fa`](https://liteforge.hub.caldera.xyz/address/0xd5118dEe968d1533B2A57aB66C266010AD8957fa) — the default token in LitZap (6 decimals).
+
+<Callout type="info">
+  Source for all contracts is in the [GitHub repository](https://github.com/Litzap/litzap/tree/main/contracts). Built with Solidity 0.8.24 and OpenZeppelin v5.
+</Callout>
+
+## What each contract does
+
+### LitZapRegistry
+Maps a human `name.zap` handle to a wallet address. Names are `[a-z0-9_]`, 3–20 characters, unique, one per address. Anyone — including other LitVM apps — can resolve a name on-chain.
+
+### LitZapPay
+Non-custodial payments: funds pass straight through from sender to recipient (native or ERC-20). Also emits payment **requests** and supports **boomerang claims** (send-to-claim with auto-return). The protocol fee is hard-capped in the contract and currently set to **zero**.
+
+### LitZapEscrow
+The contract behind **pay-by-social**. A sender locks funds against an off-chain identity (e.g. an X handle), and the funds are released only to the verified owner — or refunded to the sender after expiry. Designed as a public, composable primitive. Full details in [Pay-by-social](/pay-by-social).
+
+### LitZapSubscriptions
+Recurring payments via on-chain allowances — the basis for memberships and scheduled payouts.
+
+### LitZapCapsule
+ERC-721 collectibles for receipts, badges, and moments — an extensible on-chain object LitZap features can build on.
+
+## Safety properties
+
+- **Non-custodial** — completed payments never sit in a LitZap contract; the only held funds are open escrows/claims, which are always refundable by the sender after expiry.
+- **Fee cap** — the maximum protocol fee is fixed in code and cannot be raised past its ceiling.
+- **Guarded** — payment and escrow contracts use reentrancy protection and pausability.
+
+See [Security &amp; trust](/security) for the full model.

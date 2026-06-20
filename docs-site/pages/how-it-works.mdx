@@ -1,0 +1,78 @@
+import { Steps, Callout } from "nextra/components";
+
+# How it works
+
+LitZap turns a few crypto-heavy steps into one smooth flow. Here's what actually happens, end to end.
+
+## Getting started
+
+<Steps>
+
+### Sign in
+
+Choose email, Google, X, or Discord. There's no seed phrase and nothing to install.
+
+### Get your wallet
+
+A secure, self-custodied wallet is created for you automatically the first time you sign in. You control it — LitZap never holds your funds. (See [Architecture](/architecture).)
+
+### Claim your `name.zap`
+
+Pick a handle like `flamingo.zap`. It's registered on-chain and becomes the address people pay you at — and how Zapster knows you.
+
+</Steps>
+
+## Sending money
+
+<Steps>
+
+### Choose how to pay
+
+Pay a `name.zap`, a wallet address, or someone's **X / Discord / email**.
+
+### Enter the amount
+
+Pick **USDC** (the default) or native **zkLTC**, add an optional note.
+
+### Send
+
+- **To a `name.zap` or address** → the payment settles on-chain instantly.
+- **To a social handle not yet on LitZap** → the funds are locked in escrow until that person verifies the handle. See [Pay-by-social](/pay-by-social).
+
+</Steps>
+
+## Receiving money
+
+People can pay you several ways, and they all land in the same wallet:
+
+- **Your `name.zap`** — the simplest. "Send it to `flamingo.zap`."
+- **Your payment link / QR** — share it anywhere; anyone can pay you, even a first-time user.
+- **Your verified X or Discord** — once linked, people can pay your handle directly.
+
+## Claiming a payment sent to your handle
+
+If someone paid your X/Discord/email before you had an account:
+
+<Steps>
+
+### Sign in with that identity
+
+Use the same X / Discord / email the money was sent to (or sign in any way and connect it).
+
+### Verify ownership
+
+LitZap confirms you genuinely own the handle through that account's own login — no passwords are ever shared with us.
+
+### Claim
+
+A **"Money waiting for you"** prompt appears on your home screen. Tap **Claim**, and the funds move into your wallet.
+
+</Steps>
+
+<Callout type="info">
+  If a social payment is never claimed, it auto-refunds to the sender after the expiry window. No funds get stuck. See [Security &amp; trust](/security).
+</Callout>
+
+## Drops
+
+Send money to a whole group at once — a fixed split or a lucky-draw split — and share a single link or code. Great for community rewards, tips, and giveaways.

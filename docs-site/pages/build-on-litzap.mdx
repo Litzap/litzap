@@ -1,0 +1,57 @@
+import { Callout } from "nextra/components";
+
+# Build on LitZap
+
+LitZap's contracts are public, composable primitives on LitVM. The app is the consumer face; the same building blocks are open to **businesses and other LitVM projects** — for payments, identity, and pay-by-social.
+
+<Callout type="info">
+  This is an early, evolving surface. The contracts are live and callable today; a polished SDK and hosted API are on the [Roadmap](/roadmap). Addresses and source are in the [repository](https://github.com/Litzap/litzap).
+</Callout>
+
+## What you can build on, today
+
+### Resolve `name.zap` identities
+Any contract or app can resolve a handle to an address through **LitZapRegistry** — give your users human-readable payees instead of raw addresses.
+
+```solidity
+interface ILitZapRegistry {
+  function resolve(string calldata name) external view returns (address);
+}
+```
+
+### Pay users by social handle
+Use **LitZapEscrow** to send funds to someone identified off-chain (an X/Discord handle), released to the verified owner — ideal for payouts, rewards, and bounties to people who aren't onboarded yet.
+
+The recipient key is a hash of the identity, so the same scheme works across senders:
+
+```
+recipientKey = keccak256("x:<handle>")   // or "discord:<handle>", "email:<address>"
+```
+
+```solidity
+interface ILitZapEscrow {
+  function createEscrow(
+    address token,        // address(0) for native zkLTC, or an ERC-20
+    uint256 amount,
+    bytes32 recipientKey, // keccak256("x:<handle>")
+    uint64  expiry,       // unix seconds; refundable by sender after this
+    string calldata note
+  ) external payable returns (uint256 id);
+
+  function refund(uint256 id) external; // sender reclaims after expiry
+}
+```
+
+Releases are authorized by LitZap's verification signer (bound to the claimant's address). See [Pay-by-social](/pay-by-social) for the full mechanism.
+
+### Direct & recurring payments
+**LitZapPay** for pass-through payments and requests; **LitZapSubscriptions** for allowance-based recurring payments.
+
+## Integration model
+
+- **On-chain:** call the contracts directly — they're permissionless.
+- **Verification:** pay-by-social releases currently rely on LitZap's verification signer attesting handle ownership. A public verification API for partners is on the roadmap.
+
+## Want to integrate?
+
+If you're a LitVM project or business that wants to pay users by name or social handle, accept payments, or resolve `name.zap` identities, reach out via [GitHub](https://github.com/Litzap/litzap) or [@Litzap_xyz](https://x.com/Litzap_xyz). We're actively looking for ecosystem partners.

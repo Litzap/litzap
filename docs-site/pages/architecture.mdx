@@ -1,0 +1,49 @@
+import { Callout } from "nextra/components";
+
+# Architecture
+
+LitZap is a non-custodial application on LitVM (LiteForge), Litecoin's EVM Layer-2. The design goal is simple: give a first-time user the smoothness of a fintech app while keeping the guarantees of self-custody.
+
+## The stack
+
+| Layer | What we use |
+| --- | --- |
+| **Network** | LitVM / LiteForge — Litecoin's EVM L2 (chain `4441`), gas token zkLTC |
+| **Contracts** | Solidity 0.8.24, OpenZeppelin v5, deployed via Hardhat |
+| **App** | Next.js, wagmi + viem |
+| **Auth & wallets** | Privy — embedded, self-custodied wallets via email / Google / X / Discord |
+| **Default money** | USDC on LiteForge |
+
+## Embedded, self-custodied wallets
+
+When a user signs in, an **embedded wallet** is created for them and bound to their login. The user controls the keys; LitZap cannot move their funds. This is what lets someone with no crypto background get a real on-chain wallet without ever seeing a seed phrase.
+
+<Callout type="info">
+  Self-custody means responsibility stays with the user, and trust in LitZap stays minimal — we operate the app and the helper services below, but we never take custody of balances.
+</Callout>
+
+## Gas, abstracted away
+
+LitVM transactions cost gas (zkLTC). To remove that friction for newcomers, a relayer service tops up a user's wallet with a small amount of gas when needed, so a first payment doesn't require buying a gas token first.
+
+<Callout type="warning">
+  Honest note: gas sponsorship is a cost LitZap currently bears on testnet to smooth onboarding. It is a convenience, not an unconditional promise — so we don't market LitZap as "no gas." Long term, sustainable approaches include sponsoring it as a business cost and/or letting users pay gas in the token they're sending.
+</Callout>
+
+## The verification signer (oracle)
+
+Pay-by-social needs one thing crypto can't know on its own: *does this person really own `@handle`?* LitZap runs a small **verification signer** that:
+
+1. Confirms, through the user's own social login, that they control the handle.
+2. Signs a release authorizing the escrow to pay out — **bound to the claimant's wallet address**, so it can't be redirected or front-run.
+
+The signer can **only authorize releases to the verified claimant**. It can never move funds to itself or to an arbitrary address, and it is rotatable by the contract owner. Details in [Pay-by-social](/pay-by-social) and [Security &amp; trust](/security).
+
+## Identity: `name.zap`
+
+The registry maps a human handle to an address on-chain. Names are unique, one per address, and resolved directly from the contract — so any app on LitVM can resolve `name.zap` too. See [Smart contracts](/contracts).
+
+## What runs off-chain vs on-chain
+
+- **On-chain:** identity registration, payments, escrow create/claim/refund, drops — the money and the rules.
+- **Off-chain (helper services):** gas top-ups and social-ownership verification — convenience and attestation only, never custody of funds.
