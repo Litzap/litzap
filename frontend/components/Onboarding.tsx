@@ -34,16 +34,24 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const [nameChecked, setNameChecked] = useState(false);
   const step: "auth" | "profile" = authenticated ? "profile" : "auth";
 
-  // if this wallet already owns a ZapTag on-chain, restore it — no re-claiming every login
+  // if this wallet already owns a ZapTag on-chain, restore it — no re-claiming every login.
+  // until that check finishes we show a loading state, so the claim form never flashes.
   useEffect(() => {
     (async () => {
-      if (!authenticated || !addr || !isLive) return;
+      if (!authenticated) return;
+      if (!isLive) { setNameChecked(true); return; }
+      if (!addr) return; // wait for the embedded wallet to resolve first
       try {
         const existing = await nameOfAddress(addr);
-        if (existing) signIn({ method: "email", username: existing, email: user?.email?.address, socials: { x: user?.twitter?.username ?? undefined, discord: user?.discord?.username ?? undefined }, address: addr });
+        if (existing) {
+          signIn({ method: "email", username: existing, email: user?.email?.address, socials: { x: user?.twitter?.username ?? undefined, discord: user?.discord?.username ?? undefined }, address: addr });
+          return;
+        }
       } catch {}
+      setNameChecked(true);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated, addr]);
@@ -174,7 +182,13 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
           </div>
 
           <AnimatePresence mode="wait">
-            {step === "profile" ? (
+            {step === "profile" && !nameChecked ? (
+              <motion.div key="restoring" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-8 text-center">
+                <Zapster mood="idle" size={120} />
+                <p className="font-display mt-4 text-lg font-bold text-text">Getting your account ready…</p>
+                <p className="mt-1 text-sm text-muted">One moment while we find your ZapTag.</p>
+              </motion.div>
+            ) : step === "profile" ? (
               <motion.div key="profile" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }}>
                 <h1 className="font-display text-2xl font-extrabold text-text">Claim your ZapTag</h1>
                 <p className="mb-6 mt-1 text-sm text-muted">This is how people pay you — and your Zapster agent.</p>
