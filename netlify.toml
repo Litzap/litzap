@@ -3,9 +3,6 @@
   base = "frontend"
   command = "npm run build"
   publish = ".next"
-  # Skip the build unless something in this site's folder (frontend/) actually
-  # changed — saves free-tier build minutes on a monorepo. Exit 0 = skip.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ."
 
 [build.environment]
   NODE_VERSION = "20"
