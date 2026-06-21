@@ -45,7 +45,7 @@ export function SendView() {
   const { data: bal } = useBalance({
     address,
     token: token.native ? undefined : token.address,
-    query: { enabled: !!address && (token.native || token.address !== ZERO) },
+    query: { enabled: !!address && (token.native || token.address !== ZERO), refetchInterval: 8000 },
   });
   const balNum = bal ? +bal.formatted : 0;
   const balText = token.symbol === "USDC" ? `$${balNum.toFixed(2)}` : `${balNum.toFixed(4)} ${token.symbol}`;

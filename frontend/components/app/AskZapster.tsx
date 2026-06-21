@@ -54,8 +54,8 @@ const CANCELLED: Record<Tone, string> = {
 export function AskZapster() {
   const { txs, session, addTx } = useApp();
   const address = useEmbeddedWallet();
-  const { data: usdc } = useBalance({ address, token: CONTRACTS.usdc !== ZERO ? CONTRACTS.usdc : undefined, query: { enabled: !!address && CONTRACTS.usdc !== ZERO } });
-  const { data: ltc } = useBalance({ address });
+  const { data: usdc } = useBalance({ address, token: CONTRACTS.usdc !== ZERO ? CONTRACTS.usdc : undefined, query: { enabled: !!address && CONTRACTS.usdc !== ZERO, refetchInterval: 8000 } });
+  const { data: ltc } = useBalance({ address, query: { enabled: !!address, refetchInterval: 8000 } });
 
   const [tone, setTone] = useState<Tone>("balanced");
   const [color, setColor] = useState(COLORS[0]);

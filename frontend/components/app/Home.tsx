@@ -22,13 +22,14 @@ export function Home() {
   const { session, txs, setView } = useApp();
   const address = useEmbeddedWallet();
   const hasUsdc = CONTRACTS.usdc !== ZERO;
-  const { data: usdc } = useBalance({ address, token: hasUsdc ? CONTRACTS.usdc : undefined, query: { enabled: hasUsdc } });
-  const { data: ltc } = useBalance({ address });
+  // poll so the balance stays live (wagmi caches by default and won't refresh on its own)
+  const { data: usdc } = useBalance({ address, token: hasUsdc ? CONTRACTS.usdc : undefined, query: { enabled: hasUsdc && !!address, refetchInterval: 8000 } });
+  const { data: ltc } = useBalance({ address, query: { enabled: !!address, refetchInterval: 8000 } });
   if (!session) return null;
 
   const held: { text: string }[] = [];
   if (usdc && +usdc.formatted > 0) held.push({ text: `$${(+usdc.formatted).toFixed(2)}` });
-  if (ltc && +ltc.formatted > 0) held.push({ text: `${(+ltc.formatted).toFixed(3)} ${ltc.symbol}` });
+  if (ltc && +ltc.formatted > 0) held.push({ text: `${(+ltc.formatted).toFixed(4)} ${ltc.symbol}` });
   const headline = held[0]?.text ?? "$0.00";
   const rest = held.slice(1);
 
