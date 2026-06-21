@@ -66,14 +66,33 @@ export function AskZapster() {
   const [busy, setBusy] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
 
+  const loaded = useRef(false);
   useEffect(() => {
     try {
       const t = localStorage.getItem("litzap.aitone") as Tone | null;
       const c = localStorage.getItem("litzap.aicolor");
-      if (t && GREET[t]) { setTone(t); setLog([{ who: "zap", text: GREET[t] }]); }
+      if (t && GREET[t]) setTone(t);
       if (c) setColor(c);
+      // restore the recent conversation, but drop it after 24h of dormancy
+      const raw = localStorage.getItem("litzap.ailog");
+      let restored = false;
+      if (raw) {
+        const obj = JSON.parse(raw);
+        if (obj && Array.isArray(obj.msgs) && obj.msgs.length && Date.now() - (obj.ts ?? 0) < 864e5) {
+          setLog(obj.msgs);
+          restored = true;
+        }
+      }
+      if (!restored && t && GREET[t]) setLog([{ who: "zap", text: GREET[t] }]);
     } catch {}
+    loaded.current = true;
   }, []);
+
+  // persist the conversation (survives closing the panel; auto-expires after 24h)
+  useEffect(() => {
+    if (!loaded.current) return;
+    try { localStorage.setItem("litzap.ailog", JSON.stringify({ ts: Date.now(), msgs: log.slice(-40) })); } catch {}
+  }, [log]);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
