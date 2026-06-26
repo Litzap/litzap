@@ -55,6 +55,7 @@ export function MarketingFooter() {
         </div>
         <FooterCol title="Product" links={[["People", "/people"], ["Business", "/business"], ["Developers", "/developers"], ["Projects", "/projects"]]} />
         <FooterCol title="Get started" links={[["Create account", "/#start"], ["Get paid", "/#start"], ["Partner with us", "/projects"]]} />
+        <FooterCol title="Trust" links={[["Security", "/security"], ["Non-custodial", "/security"], ["Contracts", "/security"]]} />
       </div>
       <div className="border-t py-6 text-center text-xs text-muted" style={{ borderColor: "var(--border)" }}>
         © 2026 LitZap · Built on LitVM · Non-custodial

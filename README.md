@@ -47,6 +47,12 @@ USDC (LiteForge): [`0xd5118dEe968d1533B2A57aB66C266010AD8957fa`](https://litefor
 - **App:** Next.js 14 (app router), wagmi v2 / viem v2, Privy (auth + embedded wallets), Framer Motion, Tailwind.
 - **Brand:** custom mascot **Zapster**, Fraunces + Plus Jakarta Sans.
 
+## Security & trust
+
+LitZap is non-custodial by design: signing in creates an embedded wallet only you control — LitZap never holds your keys and cannot move your funds. Every primitive is a public contract on LitVM you can read and verify; a relayer sponsors gas but can never touch your balance; pay-by-social escrow releases only to the verified owner (bound to their address, front-run-safe) and auto-refunds if unclaimed.
+
+This is an **unaudited testnet** deployment — transactions are public, not private, and balances should be treated as test funds. Full write-up: **[litzap.xyz/security](https://litzap.xyz/security)**. Responsible disclosure: `flamingobuidl@gmail.com`.
+
 ## Roadmap
 
 1. **Move** — agentic + programmable payments (split / schedule / escrow / request / drop). ← live & in progress
@@ -64,6 +70,10 @@ cd frontend && npm install --legacy-peer-deps
 cp .env.example .env.local   # fill in values
 npm run build && npm start
 ```
+
+## License
+
+Released under the [MIT License](LICENSE) — the contracts and code are open building blocks. Integrate, fork, and build on them.
 
 ---
 
