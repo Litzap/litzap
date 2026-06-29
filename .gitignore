@@ -23,5 +23,6 @@ contracts/typechain-types/
 
 # misc
 *.log
+*.tsbuildinfo
 .DS_Store
 Thumbs.db

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useWriteContract, useSwitchChain } from "wagmi";
 import { readContract } from "wagmi/actions";
 import { keccak256, toHex, parseEther, isAddress } from "viem";
-import { wagmiConfig, CONTRACTS, NATIVE, ZERO, isLive } from "@/lib/config";
+import { wagmiConfig, CONTRACTS, NATIVE, ZERO, isLive, litvm } from "@/lib/config";
 import { payAbi, registryAbi } from "@/lib/abi";
 import { Icon, type IconName } from "./Icon";
 import type { Mood } from "./Zapster";
@@ -56,8 +56,9 @@ function Toggle({
 }
 
 export function SendCard({ onMood }: { onMood: (m: Mood) => void }) {
-  const { isConnected } = useAccount();
+  const { isConnected, chainId } = useAccount();
   const { writeContractAsync } = useWriteContract();
+  const { switchChainAsync } = useSwitchChain();
 
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
@@ -126,10 +127,14 @@ export function SendCard({ onMood }: { onMood: (m: Mood) => void }) {
 
       if (!isConnected) throw new Error("Connect your wallet first.");
 
+      // External wallets may be on Ethereum mainnet — force LitVM (4441) before signing.
+      if (chainId !== litvm.id) await switchChainAsync({ chainId: litvm.id });
+
       if (claimMode) {
         const { secret, hash } = newSecret();
         const expiry = BigInt(Math.floor(Date.now() / 1000) + 24 * 3600);
         await writeContractAsync({
+          chainId: litvm.id,
           address: CONTRACTS.pay,
           abi: payAbi,
           functionName: "createClaim",
@@ -147,6 +152,7 @@ export function SendCard({ onMood }: { onMood: (m: Mood) => void }) {
       } else {
         const dest = await resolveRecipient();
         await writeContractAsync({
+          chainId: litvm.id,
           address: CONTRACTS.pay,
           abi: payAbi,
           functionName: "pay",

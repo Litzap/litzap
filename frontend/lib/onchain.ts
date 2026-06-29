@@ -1,7 +1,40 @@
-import { writeContract, readContract, waitForTransactionReceipt } from "wagmi/actions";
+import { writeContract as wagmiWrite, readContract, waitForTransactionReceipt, getAccount, switchChain } from "wagmi/actions";
 import { parseEther, createPublicClient, http, parseAbiItem, decodeEventLog, keccak256, toBytes } from "viem";
 import { wagmiConfig, CONTRACTS, NATIVE, ZERO, litvm } from "./config";
 import { registryAbi, payAbi, erc20Abi, escrowAbi, dropsAbi } from "./abi";
+
+/**
+ * Sign a write transaction on LitVM (chain 4441).
+ *
+ * External wallets (MetaMask / Rabby / OKX) keep whatever network they're
+ * currently on — often Ethereum mainnet — so a bare `writeContract` would
+ * prompt the user to send on the wrong chain. We switch the active wallet to
+ * LitVM first, then pin `chainId` so the transaction can never be submitted on
+ * any other network. (Privy embedded wallets are already pinned to LitVM via
+ * `supportedChains`, but going through here keeps every path consistent.)
+ */
+type WriteArgs = {
+  address: `0x${string}`;
+  abi: readonly unknown[];
+  functionName: string;
+  args?: readonly unknown[];
+  value?: bigint;
+};
+
+async function writeContract(params: WriteArgs): Promise<`0x${string}`> {
+  // Only switch when a wallet is actually connected on the wrong chain. Embedded
+  // Privy wallets are already pinned to LitVM; external wallets (MetaMask etc.)
+  // may be on Ethereum mainnet. Switching while disconnected would throw a
+  // misleading "Connector not connected" before the write even runs.
+  const acct = getAccount(wagmiConfig);
+  if (acct.status === "connected" && acct.chainId !== litvm.id) {
+    await switchChain(wagmiConfig, { chainId: litvm.id });
+  }
+  // wagmiWrite's param type is config-generic; the WriteArgs shape above keeps
+  // call sites honest, and we hand the chain-pinned payload across the boundary.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return wagmiWrite(wagmiConfig, { ...params, chainId: litvm.id } as any);
+}
 
 /** Read who owns a ZapTag (zero address = available). */
 export async function resolveName(name: string): Promise<`0x${string}`> {
@@ -30,7 +63,7 @@ export async function nameOfAddress(addr: `0x${string}`): Promise<string> {
 
 /** Register a ZapTag on-chain (requires a connected wallet on chain 4441). */
 export async function registerName(name: string): Promise<`0x${string}`> {
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.registry,
     abi: registryAbi,
     functionName: "register",
@@ -42,7 +75,7 @@ export async function registerName(name: string): Promise<`0x${string}`> {
 
 /** Release a ZapTag you own (frees it). Signs with the active wallet. */
 export async function releaseName(name: string): Promise<`0x${string}`> {
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.registry,
     abi: registryAbi,
     functionName: "release",
@@ -55,7 +88,7 @@ export async function releaseName(name: string): Promise<`0x${string}`> {
 /** Send native zkLTC through LitZapPay (requires a connected wallet). */
 export async function payNative(to: `0x${string}`, amount: string, note = ""): Promise<`0x${string}`> {
   const value = parseEther(amount);
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.pay,
     abi: payAbi,
     functionName: "pay",
@@ -68,7 +101,7 @@ export async function payNative(to: `0x${string}`, amount: string, note = ""): P
 
 /** Send an ERC-20 (e.g. USDC) through LitZapPay: approve then pay. `amount` is in base units. */
 export async function payErc20(token: `0x${string}`, to: `0x${string}`, amount: bigint, note = ""): Promise<`0x${string}`> {
-  const approveHash = await writeContract(wagmiConfig, {
+  const approveHash = await writeContract({
     address: token,
     abi: erc20Abi,
     functionName: "approve",
@@ -76,7 +109,7 @@ export async function payErc20(token: `0x${string}`, to: `0x${string}`, amount: 
   });
   await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
 
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.pay,
     abi: payAbi,
     functionName: "pay",
@@ -114,7 +147,7 @@ export async function createSocialEscrow(p: {
   const { token, native, amount, recipientKey, expiry, note = "" } = p;
 
   if (!native) {
-    const approveHash = await writeContract(wagmiConfig, {
+    const approveHash = await writeContract({
       address: token,
       abi: erc20Abi,
       functionName: "approve",
@@ -123,7 +156,7 @@ export async function createSocialEscrow(p: {
     await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
   }
 
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.escrow,
     abi: escrowAbi,
     functionName: "createEscrow",
@@ -149,7 +182,7 @@ export async function createSocialEscrow(p: {
 
 /** Claim an escrow with the verifier's signature, paying out to `to`. */
 export async function claimEscrow(id: bigint, to: `0x${string}`, sig: `0x${string}`): Promise<`0x${string}`> {
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.escrow,
     abi: escrowAbi,
     functionName: "claim",
@@ -161,7 +194,7 @@ export async function claimEscrow(id: bigint, to: `0x${string}`, sig: `0x${strin
 
 /** Funder reclaims an expired, unclaimed escrow. */
 export async function refundEscrow(id: bigint): Promise<`0x${string}`> {
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.escrow,
     abi: escrowAbi,
     functionName: "refund",
@@ -189,7 +222,7 @@ export type IncomingRequest = {
 
 /** Ask `payer` to pay you `amount` of `token`. Emits an on-chain request signal. */
 export async function requestPayment(payer: `0x${string}`, token: `0x${string}`, amount: bigint, note = ""): Promise<`0x${string}`> {
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.pay,
     abi: payAbi,
     functionName: "request",
@@ -252,12 +285,12 @@ export async function createDropOnchain(p: {
 }): Promise<`0x${string}`> {
   const { code, token, native, amount, count, lucky, expiry } = p;
   if (!native) {
-    const approveHash = await writeContract(wagmiConfig, {
+    const approveHash = await writeContract({
       address: token, abi: erc20Abi, functionName: "approve", args: [CONTRACTS.drops, amount],
     });
     await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
   }
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.drops,
     abi: dropsAbi,
     functionName: "createDrop",
@@ -269,7 +302,7 @@ export async function createDropOnchain(p: {
 }
 
 export async function claimDropOnchain(code: string): Promise<{ hash: `0x${string}`; amount?: bigint }> {
-  const hash = await writeContract(wagmiConfig, {
+  const hash = await writeContract({
     address: CONTRACTS.drops, abi: dropsAbi, functionName: "claim", args: [codeHash(code)],
   });
   const receipt = await waitForTransactionReceipt(wagmiConfig, { hash });
