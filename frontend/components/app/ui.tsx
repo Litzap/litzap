@@ -36,7 +36,7 @@ export function TxRow({ tx }: { tx: Tx }) {
           {tx.hash && (
             <>
               {" · "}
-              <a href={`https://liteforge.hub.caldera.xyz/tx/${tx.hash}`} target="_blank" rel="noreferrer" className="text-accent underline">
+              <a href={`https://liteforge.explorer.caldera.xyz/tx/${tx.hash}`} target="_blank" rel="noreferrer" className="text-accent underline">
                 tx
               </a>
             </>

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "How LitZap keeps your money yours: non-custodial embedded wallets, public on-chain contracts, gas sponsorship, and front-run-safe escrow. Built on LitVM.",
 };
 
-const EXPLORER = "https://liteforge.hub.caldera.xyz/address/";
+const EXPLORER = "https://liteforge.explorer.caldera.xyz/address/";
 
 const CONTRACTS: { name: string; purpose: string; address: string }[] = [
   { name: "LitZapRegistry", purpose: "name.zap identity", address: "0x5F98A240De0a92620Fad513525c4F5f046b4A81D" },

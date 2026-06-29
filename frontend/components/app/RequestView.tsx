@@ -8,7 +8,7 @@ import { ZERO, isLive } from "@/lib/config";
 import { resolveName, requestPayment } from "@/lib/onchain";
 import { Icon } from "@/components/Icon";
 
-const EXPLORER = "https://liteforge.hub.caldera.xyz/tx/";
+const EXPLORER = "https://liteforge.explorer.caldera.xyz/tx/";
 
 export function RequestView() {
   const { session } = useApp();

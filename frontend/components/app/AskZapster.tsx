@@ -26,7 +26,7 @@ type Msg = { who: "you" | "zap"; text: string; hash?: string };
 type Tone = "playful" | "balanced" | "professional";
 
 const COLORS = ["#5b86ff", "#7b5bff", "#15a34a", "#ff7a59", "#ff4d8d", "#f5b400"];
-const EXPLORER = "https://liteforge.hub.caldera.xyz/tx/";
+const EXPLORER = "https://liteforge.explorer.caldera.xyz/tx/";
 const CLAIM_HOURS = 24;
 
 const GREET: Record<Tone, string> = {

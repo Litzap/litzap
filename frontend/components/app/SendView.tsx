@@ -20,7 +20,7 @@ const TABS: { kind: Kind; label: string; icon: IconName; placeholder: string }[]
   { kind: "x", label: "X", icon: "x", placeholder: "@handle on X" },
   { kind: "discord", label: "Discord", icon: "discord", placeholder: "their Discord username" },
 ];
-const EXPLORER = "https://liteforge.hub.caldera.xyz/tx/";
+const EXPLORER = "https://liteforge.explorer.caldera.xyz/tx/";
 const CLAIM_HOURS = 24;
 
 export function SendView() {

@@ -32,14 +32,14 @@ The contracts **are** the protocol. Every primitive is a public, composable buil
 
 | Contract | Purpose | Address |
 |---|---|---|
-| `LitZapRegistry` | `name.zap` identity | [`0x5F98A240De0a92620Fad513525c4F5f046b4A81D`](https://liteforge.hub.caldera.xyz/address/0x5F98A240De0a92620Fad513525c4F5f046b4A81D) |
-| `LitZapPay` | non-custodial payments + requests + boomerang claims | [`0xE5bF48f6b6Ea117Cac3Fa7B5E466441778E28c9A`](https://liteforge.hub.caldera.xyz/address/0xE5bF48f6b6Ea117Cac3Fa7B5E466441778E28c9A) |
-| `LitZapEscrow` | pay-by-social + hold-until-delivered escrow | [`0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30`](https://liteforge.hub.caldera.xyz/address/0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30) |
-| `LitZapDrops` | on-chain group money drops (red-packet) | [`0x1cF889Fd8e262b639Acf23B4E33c3cE5134b9d01`](https://liteforge.hub.caldera.xyz/address/0x1cF889Fd8e262b639Acf23B4E33c3cE5134b9d01) |
-| `LitZapSubscriptions` | recurring payments | [`0x9C4E9902173fB14A0CdC5B60F74E4Dbd55D5344B`](https://liteforge.hub.caldera.xyz/address/0x9C4E9902173fB14A0CdC5B60F74E4Dbd55D5344B) |
-| `LitZapCapsule` | on-chain collectibles (ERC-721) | [`0x3F7b5DC6687761A8B49bC57B33183EB5150180b0`](https://liteforge.hub.caldera.xyz/address/0x3F7b5DC6687761A8B49bC57B33183EB5150180b0) |
+| `LitZapRegistry` | `name.zap` identity | [`0x5F98A240De0a92620Fad513525c4F5f046b4A81D`](https://liteforge.explorer.caldera.xyz/address/0x5F98A240De0a92620Fad513525c4F5f046b4A81D) |
+| `LitZapPay` | non-custodial payments + requests + boomerang claims | [`0xE5bF48f6b6Ea117Cac3Fa7B5E466441778E28c9A`](https://liteforge.explorer.caldera.xyz/address/0xE5bF48f6b6Ea117Cac3Fa7B5E466441778E28c9A) |
+| `LitZapEscrow` | pay-by-social + hold-until-delivered escrow | [`0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30`](https://liteforge.explorer.caldera.xyz/address/0x315Fd6effBd3aDbd1CfBc53BE5d6CFB32A23fE30) |
+| `LitZapDrops` | on-chain group money drops (red-packet) | [`0x1cF889Fd8e262b639Acf23B4E33c3cE5134b9d01`](https://liteforge.explorer.caldera.xyz/address/0x1cF889Fd8e262b639Acf23B4E33c3cE5134b9d01) |
+| `LitZapSubscriptions` | recurring payments | [`0x9C4E9902173fB14A0CdC5B60F74E4Dbd55D5344B`](https://liteforge.explorer.caldera.xyz/address/0x9C4E9902173fB14A0CdC5B60F74E4Dbd55D5344B) |
+| `LitZapCapsule` | on-chain collectibles (ERC-721) | [`0x3F7b5DC6687761A8B49bC57B33183EB5150180b0`](https://liteforge.explorer.caldera.xyz/address/0x3F7b5DC6687761A8B49bC57B33183EB5150180b0) |
 
-USDC (LiteForge): [`0xd5118dEe968d1533B2A57aB66C266010AD8957fa`](https://liteforge.hub.caldera.xyz/address/0xd5118dEe968d1533B2A57aB66C266010AD8957fa)
+USDC (LiteForge): [`0xd5118dEe968d1533B2A57aB66C266010AD8957fa`](https://liteforge.explorer.caldera.xyz/address/0xd5118dEe968d1533B2A57aB66C266010AD8957fa)
 
 ## Tech
 
