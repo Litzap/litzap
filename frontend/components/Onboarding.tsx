@@ -7,6 +7,7 @@ import { useApp } from "@/lib/store";
 import { isLive } from "@/lib/config";
 import { useEmbeddedWallet } from "@/lib/wallet";
 import { isNameAvailable, registerName, nameOfAddress } from "@/lib/onchain";
+import { sponsorGas } from "@/lib/gas";
 import { Logo } from "./Logo";
 import { Zapster } from "./Zapster";
 import { Icon, type IconName } from "./Icon";
@@ -22,7 +23,7 @@ const errText = (e: unknown) => (e as { message?: string })?.message || "Somethi
 
 export function Onboarding({ onBack }: { onBack?: () => void }) {
   const { signIn } = useApp();
-  const { ready, authenticated, user, login } = usePrivy();
+  const { ready, authenticated, user, login, getAccessToken } = usePrivy();
   const addr = useEmbeddedWallet();
   const { sendCode, loginWithCode } = useLoginWithEmail();
   const { initOAuth } = useLoginWithOAuth();
@@ -125,7 +126,7 @@ export function Onboarding({ onBack }: { onBack?: () => void }) {
         return;
       }
       // sponsor gas so the embedded wallet can pay to register, then claim on-chain (persists)
-      await fetch("/api/gas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ address: addr }) }).catch(() => {});
+      await sponsorGas(addr, getAccessToken);
       if (isLive) await registerName(u);
       const method = user?.wallet?.walletClientType && user.wallet.walletClientType !== "privy" ? "wallet" : "email";
       signIn({ method, username: u, email: user?.email?.address, socials: { x: user?.twitter?.username ?? undefined, discord: user?.discord?.username ?? undefined }, address: addr });

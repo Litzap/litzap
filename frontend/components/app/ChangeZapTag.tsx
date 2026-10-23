@@ -6,16 +6,12 @@ import { useSetActiveWallet } from "@privy-io/wagmi";
 import { useApp } from "@/lib/store";
 import { ZERO } from "@/lib/config";
 import { resolveName, registerName, releaseName, nameOfAddress } from "@/lib/onchain";
+import { sponsorGas } from "@/lib/gas";
 import { Icon } from "@/components/Icon";
 
-async function dripGas(address: string) {
-  try {
-    await fetch("/api/gas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ address }) });
-  } catch {}
-}
-
 export function ChangeZapTag() {
-  const { user } = usePrivy();
+  const { user, getAccessToken } = usePrivy();
+  const dripGas = (address: string) => sponsorGas(address, getAccessToken);
   const { wallets } = useWallets();
   const { setActiveWallet } = useSetActiveWallet();
   const { signIn } = useApp();

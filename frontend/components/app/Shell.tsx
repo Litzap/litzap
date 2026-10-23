@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useApp, type View } from "@/lib/store";
 import { useEmbeddedWallet } from "@/lib/wallet";
+import { sponsorGas } from "@/lib/gas";
 import { Logo } from "@/components/Logo";
 import { Icon, type IconName } from "@/components/Icon";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -29,17 +30,16 @@ const VIEWS = { home: Home, send: SendView, request: RequestView, receive: Recei
 
 export function Shell() {
   const { view, setView, session, signOut } = useApp();
-  const { logout } = usePrivy();
+  const { logout, getAccessToken } = usePrivy();
   const address = useEmbeddedWallet();
+  const [gasErr, setGasErr] = useState("");
 
   // sponsor gas: top up the wallet so email users can send without holding gas
   useEffect(() => {
     if (!address) return;
-    fetch("/api/gas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address }),
-    }).catch(() => {});
+    setGasErr("");
+    sponsorGas(address, getAccessToken).catch((e: Error) => setGasErr(e.message));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   if (!session) return null;
@@ -115,6 +115,14 @@ export function Shell() {
         </header>
 
         <main className="mx-auto w-full max-w-5xl px-5 py-8 md:px-10 md:py-10">
+          {gasErr && (
+            <div className="panel mb-5 flex items-center gap-3 px-5 py-3 text-sm">
+              <span className="flex-1 text-accent">{gasErr}</span>
+              <button onClick={() => setGasErr("")} className="text-muted hover:text-text" title="Dismiss">
+                ✕
+              </button>
+            </div>
+          )}
           <Current />
         </main>
 
